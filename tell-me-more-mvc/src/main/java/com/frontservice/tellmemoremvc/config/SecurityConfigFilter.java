@@ -20,25 +20,27 @@ public class SecurityConfigFilter {
         // InMemoryUserDetailsManager (see below)
 		
 
-        UserDetails john = User.builder()
-            .username("user1")
-            .password(passwordEncoder().encode("user1Pass"))
-            .roles("USER","SUBSCRIBED")
-            .build();
-
-        UserDetails mary = User.builder()
-                .username("user2")
-                .password(passwordEncoder().encode("user2Pass"))
-                .roles("USER")
-                .build();
-
-        UserDetails susan = User.builder()
-                .username("admin")
-                .password(passwordEncoder().encode("admin"))
-                .roles("ADMIN","USER","SUBSCRIBED")
-                .build();
-        
-        return new InMemoryUserDetailsManager(john, mary, susan);
+//        UserDetails john = User.builder()
+//            .username("user1")
+//            .password(passwordEncoder().encode("user1Pass"))
+//            .roles("USER","SUBSCRIBED")
+//            .build();
+//
+//        UserDetails mary = User.builder()
+//                .username("user2")
+//                .password(passwordEncoder().encode("user2Pass"))
+//                .roles("USER")
+//                .build();
+//
+//        UserDetails susan = User.builder()
+//                .username("admin")
+//                .password(passwordEncoder().encode("admin"))
+//                .roles("ADMIN","USER","SUBSCRIBED")
+//                .build();
+//        
+//        return new InMemoryUserDetailsManager(john, mary, susan);
+		
+		return new LoginInfoUserDetailsService();
     }
 	
 	@Bean 
