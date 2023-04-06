@@ -2,13 +2,13 @@ package com.frontservice.tellmemoremvc.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @EnableWebSecurity
@@ -16,7 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfigFilter {
 	
 	@Bean
-    public InMemoryUserDetailsManager userDetailsService() {
+    public UserDetailsService userDetailsService() {
         // InMemoryUserDetailsManager (see below)
 		
 
@@ -66,18 +66,33 @@ public class SecurityConfigFilter {
 //		
 //		.build();
 		
-		return http
-				.authorizeRequests(configurer ->
+		return http.csrf().disable()
+				.authorizeHttpRequests(configurer ->
 					configurer
-						.antMatchers("/subscription").hasRole("SUBSCRIBED").anyRequest().authenticated())
-				
+					
+						.antMatchers("/subscription").hasRole("SUBSCRIBED")
+						.antMatchers("/addUser","/allUsers/*").permitAll()
+						.anyRequest().authenticated()
+						//the more specific rules need to come first, followed by the more general ones. that is why anyRequest is last otherwise
+						//it fails and application run fails as well.
+						)
 				.formLogin(configurer ->
 					configurer
 						.loginPage("/showMyLoginPage")
 						.loginProcessingUrl("/authenticateTheUser")
 						.permitAll())
+				
 				.logout(configurer -> configurer.permitAll())
 				
 				.build();
     }
+	
+	@Bean
+	public AuthenticationProvider authenticationProvider() {
+		DaoAuthenticationProvider authProv = new DaoAuthenticationProvider();
+		authProv.setUserDetailsService(userDetailsService());
+		authProv.setPasswordEncoder(passwordEncoder());
+		
+		return authProv;
+	}
 }
